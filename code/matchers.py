@@ -11,6 +11,7 @@ class matchers:
 		self.flann = cv2.FlannBasedMatcher(index_params, search_params)
 
 	def match(self, i1, i2, direction=None):
+		# TODO 更新为ORB特征提取
 		imageSet1 = self.getSURFFeatures(i1)
 		imageSet2 = self.getSURFFeatures(i2)
 		print("Direction : ", direction)

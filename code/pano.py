@@ -4,17 +4,16 @@ import sys
 from matchers import matchers,ORB_Matcher
 import time
 from classifier import Classifier
+import threading
 
 class Stitch:
-    def __init__(self, args):
-        self.path = args
-        fp = open(self.path, 'r')
-        filenames = [each.rstrip('\r\n') for each in  fp.readlines()]
-        print(filenames)
-        self.images = [cv2.resize(cv2.imread(each),(480, 320)) for each in filenames]
+    def __init__(self):
+        self.matcher_obj = matchers()
+
+    def set_image_list(self,img_list):
+        self.images = [cv2.resize(cv2.imread(each),(480, 320)) for each in img_list]
         self.count = len(self.images)
         self.left_list, self.right_list, self.center_im = [], [],None
-        self.matcher_obj = matchers()
         self.prepare_lists()
 
     def prepare_lists(self):
@@ -132,29 +131,32 @@ if __name__ == '__main__':
     c = Classifier('../images')
     c.classify()
     re = c.getImageSet()
-    print(1)
+    s = Stitch()
+    for each in re:
+        s.set_image_list(each)
+        left = s.leftshift()
+        right = s.rightshift()
+        cv2.imshow('right', right)
+        print("image written")
+        if cv2.waitKey(3000):
+            cv2.destroyAllWindows()
+
     # try:
     #     args = sys.argv[1]
     # except:
     #     args = "txtlists/files1.txt"
     # finally:
     #     print("Parameters : ", args)
-    # orb_matcher = ORB_Matcher()
-    # s = Stitch(args)
-    # left =s.leftshift()
-    # #cv2.imshow('left',left)
-    # #cv2.waitKey(0)
-    # right = s.rightshift()
-    # cv2.imshow('right',right)
-    # #out=left+right
-    # #print(out)
-    # #cv2.imshow('out',out)
-    # #cv2.waitKey()
-    # #s.showImage('left')
-    # #s.showImage('right')
-    # #print("done")
-    # #cv2.imwrite("test12.jpg", s.leftImage)
-    # print("image written")
-    # if cv2.waitKey(3000):
-    #     cv2.destroyAllWindows()
+
+    #cv2.imshow('left',left)
+    #cv2.waitKey(0)
+
+    #out=left+right
+    #print(out)
+    #cv2.imshow('out',out)
+    #cv2.waitKey()
+    #s.showImage('left')
+    #s.showImage('right')
+    #print("done")
+    #cv2.imwrite("test12.jpg", s.leftImage)
 
