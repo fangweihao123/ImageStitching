@@ -4,6 +4,8 @@ import sys
 
 class matchers:
 	def __init__(self):
+		self.orb = cv2.ORB_create()
+		self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
 		self.surf = cv2.xfeatures2d.SURF_create()
 		FLANN_INDEX_KDTREE = 0  # FLANN 参数
 		index_params = dict(algorithm=0, trees=5)
@@ -12,17 +14,19 @@ class matchers:
 
 	def match(self, i1, i2, direction=None):
 		# TODO 更新为ORB特征提取
-		imageSet1 = self.getSURFFeatures(i1)
-		imageSet2 = self.getSURFFeatures(i2)
+		imageSet1 = self.getORBFeatures(i1)
+		imageSet2 = self.getORBFeatures(i2)
+		# imageSet1 = self.getSURFFeatures(i1)
+		# imageSet2 = self.getSURFFeatures(i2)
 		print("Direction : ", direction)
-		matches = self.flann.knnMatch(
+		matches = self.bf.knnMatch(
 			imageSet2['des'],
 			imageSet1['des'],
 			k=2
 			)
 		good = []
 		for i , (m, n) in enumerate(matches):
-			if m.distance < 0.7*n.distance:
+			if m.distance < 0.8*n.distance:
 				good.append((m.trainIdx, m.queryIdx))
 
 		if len(good) > 4:
@@ -44,6 +48,10 @@ class matchers:
 		gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 		kp, des = self.surf.detectAndCompute(gray, None)
 		return {'kp':kp, 'des':des}
+
+	def getORBFeatures(self,im):
+		kp ,des = self.orb.detectAndCompute(im, None)
+		return {'kp': kp, 'des': des}
 
 class ORB_Matcher:
 	def __init__(self):

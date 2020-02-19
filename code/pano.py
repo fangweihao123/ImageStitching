@@ -132,10 +132,13 @@ if __name__ == '__main__':
     c.classify()
     re = c.getImageSet()
     s = Stitch()
+    cnt = 0
     for each in re:
         s.set_image_list(each)
         left = s.leftshift()
         right = s.rightshift()
+        cv2.imwrite(str(cnt) + '.jpg',right)
+        cnt = cnt + 1
         cv2.imshow('right', right)
         print("image written")
         if cv2.waitKey(3000):
