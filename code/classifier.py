@@ -1,18 +1,18 @@
 import os
-import re
 import cv2
 from matchers import matchers,ORB_Matcher
 from utils import getFatherIndex
 
 class Classifier:
-    def __init__(self,img_folder):
+    def __init__(self,img_list):
         # 需要跳过其他文件夹和其他类型的文件 目前就jpg jpeg png三种格式把
         # 这里用orb特征子来做把
-        self.real_img = []
-        for file_name in os.listdir(img_folder):
-            type = file_name.split('.')[-1]
-            if type == 'jpg' or type=='jpeg' or type=='png':
-                self.real_img.append((img_folder + '/' + file_name))
+        self.real_img = img_list
+        #self.real_img =[]
+        # for file_name in os.listdir(img_folder):
+        #     type = file_name.split('.')[-1]
+        #     if type == 'jpg' or type=='jpeg' or type=='png':
+        #         self.real_img.append((img_folder + '/' + file_name))
         self.solo_img = []
         self.img_set = []
         self.images = [cv2.resize(cv2.imread(each), (480, 320)) for each in self.real_img]

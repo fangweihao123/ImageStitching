@@ -1,10 +1,8 @@
 import numpy as np
 import cv2
-import sys
 from matchers import matchers,ORB_Matcher
 import time
-from classifier import Classifier
-import threading
+from classifier import  Classifier
 
 class Stitch:
     def __init__(self):
@@ -18,7 +16,7 @@ class Stitch:
 
     def prepare_lists(self):
         print("Number of images : %d"%self.count)
-        self.centerIdx = self.count/2 
+        self.centerIdx = self.count/2
         print("Center index image : %d"%self.centerIdx)
         self.center_im = self.images[int(self.centerIdx)]
         for i in range(self.count):
@@ -73,7 +71,6 @@ class Stitch:
             print("tmp shape",tmp.shape)
             print("self.leftimage shape=", self.leftImage.shape)
             self.leftImage = tmp
-        # self.showImage('left')
             return self.leftImage
 
 
@@ -81,7 +78,6 @@ class Stitch:
         i1y, i1x = leftImage.shape[:2]
         i2y, i2x = warpedImage.shape[:2]
         print(leftImage[-1,-1])
-
         t = time.time()
         black_l = np.where(leftImage == np.array([0,0,0]))
         black_wi = np.where(warpedImage == np.array([0,0,0]))
@@ -93,7 +89,7 @@ class Stitch:
                 try:
                     if(np.array_equal(leftImage[j,i],np.array([0,0,0])) and  np.array_equal(warpedImage[j,i],np.array([0,0,0]))):
                         # print "BLACK"
-                        # instead of just putting it with black, 
+                        # instead of just putting it with black,
                         # take average of all nearby values and avg it.
                         warpedImage[j,i] = [0, 0, 0]
                     else:
@@ -119,16 +115,10 @@ class Stitch:
     def trim_left(self):
         pass
 
-    def showImage(self, string=None):
-        if string == 'left':
-            cv2.imshow("image", self.leftImage)
-            print('hello')
-            # cv2.imshow("left image", cv2.resize(self.leftImage, (400,400)))
-        elif string == "right":
-            cv2.imshow("image", self.rightImage)
+
 
 if __name__ == '__main__':
-    c = Classifier('../images')
+    c = Classifier('./image')
     c.classify()
     re = c.getImageSet()
     s = Stitch()
@@ -143,23 +133,4 @@ if __name__ == '__main__':
         print("image written")
         if cv2.waitKey(3000):
             cv2.destroyAllWindows()
-
-    # try:
-    #     args = sys.argv[1]
-    # except:
-    #     args = "txtlists/files1.txt"
-    # finally:
-    #     print("Parameters : ", args)
-
-    #cv2.imshow('left',left)
-    #cv2.waitKey(0)
-
-    #out=left+right
-    #print(out)
-    #cv2.imshow('out',out)
-    #cv2.waitKey()
-    #s.showImage('left')
-    #s.showImage('right')
-    #print("done")
-    #cv2.imwrite("test12.jpg", s.leftImage)
 
