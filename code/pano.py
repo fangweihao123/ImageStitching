@@ -3,6 +3,7 @@ import cv2
 from matchers import matchers,ORB_Matcher
 import time
 from classifier import  Classifier
+from blending import left_blending,right_blending
 
 class Stitch:
     def __init__(self):
@@ -49,7 +50,7 @@ class Stitch:
             tmp = cv2.warpPerspective(a, xh, dsize)# 透视变换
             # cv2.imshow("warped", tmp)
             # cv2.waitKey()
-            tmp[offsety:b.shape[0]+offsety, offsetx:b.shape[1]+offsetx] = b
+            tmp = left_blending(tmp, b, offsetx, offsety)
             a = tmp
 
         self.leftImage = tmp
@@ -71,49 +72,12 @@ class Stitch:
             print("tmp shape",tmp.shape)
             print("self.leftimage shape=", self.leftImage.shape)
             self.leftImage = tmp
-            return self.leftImage
+        return self.leftImage
 
 
     def mix_and_match(self, leftImage, warpedImage):
-        i1y, i1x = leftImage.shape[:2]
-        i2y, i2x = warpedImage.shape[:2]
-        print(leftImage[-1,-1])
-        t = time.time()
-        black_l = np.where(leftImage == np.array([0,0,0]))
-        black_wi = np.where(warpedImage == np.array([0,0,0]))
-        print(time.time() - t)
-        print(black_l[-1])
-
-        for i in range(0, i1x):
-            for j in range(0, i1y):
-                try:
-                    if(np.array_equal(leftImage[j,i],np.array([0,0,0])) and  np.array_equal(warpedImage[j,i],np.array([0,0,0]))):
-                        # print "BLACK"
-                        # instead of just putting it with black,
-                        # take average of all nearby values and avg it.
-                        warpedImage[j,i] = [0, 0, 0]
-                    else:
-                        if(np.array_equal(warpedImage[j,i],[0,0,0])):
-                            # print "PIXEL"
-                            warpedImage[j,i] = leftImage[j,i]
-                        else:
-                            if not np.array_equal(leftImage[j,i], [0,0,0]):
-                                bw, gw, rw = warpedImage[j,i]
-                                bl,gl,rl = leftImage[j,i]
-                                # b = (bl+bw)/2
-                                # g = (gl+gw)/2
-                                # r = (rl+rw)/2
-                                warpedImage[j, i] = [bl,gl,rl]
-                except:
-                    pass
-        # cv2.imshow("waRPED mix", warpedImage)
-        # cv2.waitKey()
+        warpedImage = right_blending(leftImage, warpedImage)
         return warpedImage
-
-
-
-    def trim_left(self):
-        pass
 
 
 

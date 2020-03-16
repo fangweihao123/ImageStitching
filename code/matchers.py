@@ -40,7 +40,7 @@ class matchers:
 				[pointsPrevious[i].pt for (i, __) in good]
 				)
 
-			H, s = cv2.findHomography(matchedPointsCurrent, matchedPointsPrev, cv2.RANSAC, 4)
+			H, s = cv2.findHomography(matchedPointsCurrent, matchedPointsPrev, cv2.RANSAC, 8)
 			return H
 		return None
 
@@ -50,6 +50,7 @@ class matchers:
 		return {'kp':kp, 'des':des}
 
 	def getORBFeatures(self,im):
+		gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 		kp ,des = self.orb.detectAndCompute(im, None)
 		return {'kp': kp, 'des': des}
 

@@ -57,7 +57,6 @@ class mywindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton_2.clicked.connect(self.group)
         self.pushButton_3.clicked.connect(self.pano)
 
-
     def open_file(self):#打开文件选择图片
         #选择文件夹：
         #QFileDialog.getExistingDirectory(self, "选择文件夹", "/")
@@ -69,9 +68,11 @@ class mywindow(QtWidgets.QMainWindow, Ui_MainWindow):
         #QtWidgets.QFileDialog.getSaveFileName(self, "文件保存", "/", "图片文件 (*.png);;(*.jpeg)")
         # self.img_dir = QFileDialog.getExistingDirectory(self)  # 选择文件夹名字
         # 返回选取内容的路径，多个目标用list存储
+        self.clear_tableWidget()
+        self.init_tableWidget()
         self.imgName = QFileDialog.getOpenFileNames(self, "打开图片", "", "*.jpg;;*.png;;All Files(*)")
         if len(self.imgName[0])>20:
-            print('there too many picture')
+            print('there too many picture,请选择少于20张图片')
         else:
             for i in range(len(self.imgName[0])):
                 k = int(i/5)
@@ -84,46 +85,54 @@ class mywindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 #图片路径设置与图片加载
                 # icon = QtGui.QIcon(imgName[0][i])
                 # item.setIcon(QtGui.QIcon(icon))
-                print(newItem,type(newItem),k,g)
+                #print(newItem,type(newItem),k,g)
                 # 输出当前进行的条目序号
                 # 将条目加载到相应行列中
                 self.tableWidget.setItem(k,g,newItem)
 
     def group(self):
         from classifier import Classifier
-        self.clear_tableWidget() # 清空tableWidget
+        self.clear_tableWidget()  # 清空tableWidget
         img_list = self.imgName[0]
-        # c = Classifier('./image')
-        c = Classifier(img_list)
-        c.classify()
-        self.re = c.getImageSet()
-        self.update_tableWidget() # 更新tableWidget
-        print(self.re)
+        if len(img_list)>0:
+            # c = Classifier('./image')
+            c = Classifier(img_list)
+            c.classify()
+            self.re = c.getImageSet()
+            self.update_tableWidget()  # 更新tableWidget
         k = 0
         for each in self.re:
-            len_each= len(each)
+            len_each = len(each)
             for j in range(len_each):
-                g = j%5
-                #实例化表格窗口条目
+                g = j % 5
+                # 实例化表格窗口条目
                 # item = QTableWidgetItem()
-                #print(type(QtGui.QIcon(each[j])))
-                newItem = QTableWidgetItem(QtGui.QIcon(each[j]),'')
-                print(each[j],k,g)
+                # print(type(QtGui.QIcon(each[j])))
+                newItem = QTableWidgetItem(QtGui.QIcon(each[j]), '')
+                # print(each[j],k,g)
                 # 输出当前进行的条目序号
                 # 将条目加载到相应行列中
-                self.tableWidget.setItem(k,g,newItem)
-            k = k+1
-
+                self.tableWidget.setItem(k, g, newItem)
+            k = k + 1
     def clear_tableWidget(self):
         self.tableWidget.clearContents()
 
+    def init_tableWidget(self):
+        self.tableWidget.setColumnCount(5)
+        self.tableWidget.setRowCount(4)
+        for i in range(5):  # 让列宽和图片相同
+            self.tableWidget.setColumnWidth(i, 100)
+        for i in range(4):  # 让行高和图片相同
+            self.tableWidget.setRowHeight(i, 125)
+        self.tableWidget.setIconSize(Qt.QSize(100, 125))
+
+
     def update_tableWidget(self):
-        print(len(self.re))
         le = 0
         for i in range(len(self.re)):
             if le<len(self.re[i]):
                 le =len(self.re[i])
-        print('le and each len:',le,len(self.re))
+        #print('le and each len:',le,len(self.re))
         self.tableWidget.setColumnCount(le)
         self.tableWidget.setRowCount(len(self.re))
         for i in range(le):  # 让列宽和图片相同
